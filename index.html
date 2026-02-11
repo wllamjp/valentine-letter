@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Letter For You ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffd6e8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Sealed Letter */
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 200px;
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope.hidden {
+            display: none;
+        }
+
+        /* Envelope flap */
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 100px solid #ff9ec4;
+            z-index: 2;
+        }
+
+        /* Heart seal */
+        .heart-seal {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            z-index: 3;
+        }
+
+        .heart-seal::before,
+        .heart-seal::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 48px;
+            background: #ff4757;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .heart-seal::before {
+            left: 20px;
+            transform: rotate(-45deg);
+            transform-origin: 100% 100%;
+        }
+
+        .heart-seal::after {
+            left: 7px;
+            transform: rotate(45deg);
+            transform-origin: 0 100%;
+        }
+
+        /* Letter opening animation */
+        .letter-container {
+            position: absolute;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .letter-container.show {
+            display: flex;
+        }
+
+        .letter-paper {
+            width: 280px;
+            height: 360px;
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+            padding: 20px;
+        }
+
+        .letter-paper:hover {
+            transform: translateY(-10px);
+        }
+
+        .letter-paper.hidden {
+            display: none;
+        }
+
+        /* Folded paper effect */
+        .letter-paper::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ddd 0px,
+                #ddd 10px,
+                transparent 10px,
+                transparent 20px
+            );
+        }
+
+        /* Message content */
+        .message {
+            display: none;
+            width: 400px;
+            background: #fff;
+            padding: 60px 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: unfold 0.6s ease;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        @keyframes unfold {
+            0% {
+                transform: scale(0.3) rotateX(-90deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotateX(0);
+                opacity: 1;
+            }
+        }
+
+        .message h1 {
+            font-size: 32px;
+            color: #ff4757;
+            margin-bottom: 40px;
+            font-weight: normal;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .option:hover {
+            transform: scale(1.1);
+        }
+
+        .checkbox {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ff4757;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            transition: background 0.3s ease;
+        }
+
+        .checkbox.checked {
+            background: #ff4757;
+        }
+
+        .checkmark {
+            display: none;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .checkmark.show {
+            display: block;
+        }
+
+        .option label {
+            font-size: 20px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* No box dodge animation */
+        .option.dodge {
+            animation: dodge 0.3s ease;
+        }
+
+        @keyframes dodge {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(-20px, -15px);
+            }
+            75% {
+                transform: translate(20px, 15px);
+            }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff4757;
+            top: -20px;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .instruction {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff4757;
+            font-size: 18px;
+            text-align: center;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="instruction" id="instruction">Click the letter to open it ❤️</div>
+        
+        <!-- Sealed Envelope -->
+        <div class="envelope" id="envelope">
+            <div class="heart-seal"></div>
+        </div>
+
+        <!-- Folded Letter -->
+        <div class="letter-container" id="letterContainer">
+            <div class="letter-paper" id="letterPaper">
+                <p style="color: #999; text-align: center; margin-top: 150px; font-style: italic;">
+                    Click to unfold...
+                </p>
+            </div>
+        </div>
+
+        <!-- Message -->
+        <div class="message" id="message">
+            <h1>Leana my fat chud, will you be my valentine?</h1>
+            
+            <div class="options">
+                <div class="option" id="yesOption">
+                    <div class="checkbox" id="yesBox">
+                        <span class="checkmark" id="yesCheck">✓</span>
+                    </div>
+                    <label>Yes</label>
+                </div>
+                
+                <div class="option" id="noOption">
+                    <div class="checkbox" id="noBox">
+                        <span class="checkmark" id="noCheck">✓</span>
+                    </div>
+                    <label>No</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const letterContainer = document.getElementById('letterContainer');
+        const letterPaper = document.getElementById('letterPaper');
+        const message = document.getElementById('message');
+        const instruction = document.getElementById('instruction');
+        
+        const yesOption = document.getElementById('yesOption');
+        const noOption = document.getElementById('noOption');
+        const yesBox = document.getElementById('yesBox');
+        const noBox = document.getElementById('noBox');
+        const yesCheck = document.getElementById('yesCheck');
+        const noCheck = document.getElementById('noCheck');
+
+        let yesChecked = false;
+        let noChecked = false;
+
+        // Open envelope
+        envelope.addEventListener('click', () => {
+            envelope.classList.add('hidden');
+            letterContainer.classList.add('show');
+            instruction.textContent = 'Click the paper to unfold it ❤️';
+        });
+
+        // Unfold letter
+        letterPaper.addEventListener('click', () => {
+            letterPaper.classList.add('hidden');
+            message.classList.add('show');
+            instruction.style.display = 'none';
+        });
+
+        // Yes option
+        yesOption.addEventListener('click', () => {
+            if (!yesChecked) {
+                yesBox.classList.add('checked');
+                yesCheck.classList.add('show');
+                yesChecked = true;
+                
+                // Uncheck no if it was checked
+                if (noChecked) {
+                    noBox.classList.remove('checked');
+                    noCheck.classList.remove('show');
+                    noChecked = false;
+                }
+            }
+            
+            // Create confetti every time yes is clicked
+            createConfetti();
+        });
+
+        // No option - just dodges, no checkmark
+        noOption.addEventListener('click', () => {
+            // Make the no option dodge
+            noOption.classList.add('dodge');
+            
+            // Remove the animation class after it finishes
+            setTimeout(() => {
+                noOption.classList.remove('dodge');
+            }, 300);
+        });
+
+        // Confetti function
+        function createConfetti() {
+            const colors = ['#ff4757', '#ff6b81', '#ffa502', '#ff6348', '#ff4757', '#fc5c65'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 4000);
+                }, i * 20);
+            }
+        }
+    </script>
+</body>
+</html>
